@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Sofia } from "next/font/google";
-import { getIcon, icons, TodoType } from "./criar/page";
 import { BsCheckCircleFill } from "react-icons/bs";
+import { getIcon, TodoType } from "@/utils";
 const sofia = Sofia({ weight: ["400"], subsets: ["latin"] });
 
 const numberToWeekDay = (value: number) => {
