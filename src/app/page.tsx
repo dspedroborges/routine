@@ -33,6 +33,10 @@ export default function Home() {
   }
 
   useEffect(() => {
+    const savedPositionsDone = localStorage.getItem("positionsDone");
+    if (savedPositionsDone) {
+      setPositionsDone(JSON.parse(savedPositionsDone));
+    }
     const savedTodos = localStorage.getItem("todos");
     if (savedTodos && savedTodos !== "[]") {
       let toBeChecked = JSON.parse(savedTodos);
@@ -67,13 +71,17 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <div className="p-2 mb-12">
-        <div className="border rounded-xl h-8 my-8">
-          <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-800 rounded-xl flex items-center justify-center text-white font-extrabold" style={{ width: isNaN((positionsDone.length / todos.length * 100)) ? "0%" : (positionsDone.length / todos.length * 100).toFixed(2) + "%" }}>
-            {
-              calculatePercentual() + "%"
-            }
-          </div>
-        </div>
+        {
+          todos.length > 0 && (
+            <div className="border rounded-xl h-8 my-8">
+              <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-800 rounded-xl flex items-center justify-center text-white font-extrabold" style={{ width: isNaN((positionsDone.length / todos.length * 100)) ? "0%" : (positionsDone.length / todos.length * 100).toFixed(2) + "%" }}>
+                {
+                  calculatePercentual() + "%"
+                }
+              </div>
+            </div>
+          )
+        }
         {
           todos.map((t, i) => {
             return (
@@ -98,25 +106,37 @@ export default function Home() {
         }
 
         {
-          !isUserSure ? (
-            <button onClick={() => {
-              setIsUserSure(true);
-              setTimeout(() => {
-                setIsUserSure(false);
-              }, 3000)
-            }} className="fixed bottom-2 w-[95%] left-1/2 -translate-x-1/2 bg-opacity-90 bg-white text-blue-800 border border-blue-800 p-2 rounded-xl cursor-pointer hover:scale-95">Novo dia</button>
-          ) : (
-            <button className="fixed bottom-2 w-[95%] left-1/2 -translate-x-1/2 bg-opacity-90 bg-white text-blue-800 border border-blue-800 p-2 rounded-xl cursor-pointer" onClick={() => {
-              const lsCompletionList = localStorage.getItem("completionList");
-              const percentual = (positionsDone.length / todos.length * 100);
-              if (lsCompletionList) {
-                localStorage.setItem("completionList", JSON.stringify([...JSON.parse(lsCompletionList), percentual]));
-              } else {
-                localStorage.setItem("completionList", JSON.stringify([percentual]));
+          todos.length === 0 && (
+            <p className="text-center mt-12">Você ainda não criou nenhum afazer!</p>
+          )
+        }
+
+        {
+          todos.length > 0 && (
+            <>
+              {
+                !isUserSure ? (
+                  <button onClick={() => {
+                    setIsUserSure(true);
+                    setTimeout(() => {
+                      setIsUserSure(false);
+                    }, 3000)
+                  }} className="fixed bottom-2 w-[95%] left-1/2 -translate-x-1/2 bg-opacity-90 bg-white text-blue-800 border border-blue-800 p-2 rounded-xl cursor-pointer hover:scale-95">Novo dia</button>
+                ) : (
+                  <button className="fixed bottom-2 w-[95%] left-1/2 -translate-x-1/2 bg-opacity-90 bg-white text-blue-800 border border-blue-800 p-2 rounded-xl cursor-pointer" onClick={() => {
+                    const lsCompletionList = localStorage.getItem("completionList");
+                    const percentual = (positionsDone.length / todos.length * 100);
+                    if (lsCompletionList) {
+                      localStorage.setItem("completionList", JSON.stringify([...JSON.parse(lsCompletionList), percentual]));
+                    } else {
+                      localStorage.setItem("completionList", JSON.stringify([percentual]));
+                    }
+                    setPositionsDone([]);
+                    localStorage.setItem("positionsDone", JSON.stringify([]));
+                  }}>Tenho certeza</button>
+                )
               }
-              setPositionsDone([]);
-              localStorage.setItem("positionsDone", JSON.stringify([]));
-            }}>Tenho certeza</button>
+            </>
           )
         }
       </div>

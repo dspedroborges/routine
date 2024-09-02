@@ -2,9 +2,10 @@
 
 import { getIcon, icons, TodoType } from "@/utils";
 import { useEffect, useState } from "react";
-import { BsCaretRightFill, BsPlusCircle, BsTrash2Fill } from "react-icons/bs";
+import { BsCaretRightFill, BsPlusCircle, BsTrash, BsTrash2Fill } from "react-icons/bs";
 import { FaSave } from "react-icons/fa";
 import { PiHandTapLight } from "react-icons/pi";
+import Toast from "../components/Toast";
 
 const getEmptyTodo = () => {
     return {
@@ -17,7 +18,9 @@ const getEmptyTodo = () => {
 }
 
 export default function Page() {
-    const [todos, setTodos] = useState([getEmptyTodo()])
+    const [todos, setTodos] = useState([getEmptyTodo()]);
+    const [showToast, setShowToast] = useState(false);
+    const [deleteSure, setDeleteSure] = useState(false);
 
     useEffect(() => {
         const savedTodos = localStorage.getItem("todos");
@@ -54,14 +57,25 @@ export default function Page() {
                 todos.length > 0 && todos.map((todo, i) => {
                     return (
                         <div key={i} className="border-b-4 border-dotted border-blue-800 p-8 w-full lg:w-1/2 mx-auto my-8">
-                            <BsTrash2Fill className="text-red-800 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
-                                let copy = JSON.parse(JSON.stringify(todos));
-                                let filter = [];
-                                for (let j = 0; j < copy.length; j++) {
-                                    if (j !== i) filter.push(copy[j]);
-                                }
-                                setTodos(filter);
-                            }} />
+                            {
+                                deleteSure ? (
+                                    <BsTrash className="text-red-500 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
+                                        let copy = JSON.parse(JSON.stringify(todos));
+                                        let filter = [];
+                                        for (let j = 0; j < copy.length; j++) {
+                                            if (j !== i) filter.push(copy[j]);
+                                        }
+                                        setTodos(filter);
+                                    }} />
+                                ) : (
+                                    <BsTrash className="text-red-800 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
+                                        setDeleteSure(true);
+                                        setTimeout(() => {
+                                            setDeleteSure(false);
+                                        }, 3000);
+                                    }} />
+                                )
+                            }
                             <h3 className="text-2xl font-bold text-blue-800 text-center">Afazer #{i + 1}</h3>
                             <div>
                                 <label htmlFor={`title_${i}`} className="block font-bold text-blue-800 my-4 cursor-pointer">Título</label>
@@ -106,11 +120,17 @@ export default function Page() {
                 })
             }
 
+            {showToast && <Toast content="Salvo!" type="success" setShowToast={setShowToast} />}
+
             <div className="flex justify-center items-center gap-4 mx-auto">
                 <BsPlusCircle className="text-6xl text-blue-800 hover:scale-90 cursor-pointer" onClick={() => setTodos([...todos, getEmptyTodo()])} />
                 <FaSave className="text-6xl text-green-800 hover:scale-90 cursor-pointer" onClick={(() => {
                     localStorage.setItem("todos", JSON.stringify(todos));
                     console.log(JSON.stringify(todos));
+                    setShowToast(true);
+                    setTimeout(() => {
+                        setShowToast(false);
+                    }, 3000);
                 })} />
             </div>
         </div>
@@ -206,7 +226,7 @@ function DaySelect({ onChange, value, currentTodo }: { onChange: Function, value
                     <div className="flex flex-col lg:flex-row gap-1 lg:gap-8">
                         <span className={`hover:outline hover:font-bold rounded-xl cursor-pointer p-2 outline-1 outline-blue-800 ${selectedDays.includes("Seg") && "outline outline-green-800 font-bold"}`} onClick={() => handleSelectedDay("Seg")}>Seg</span>
                         <span className={`hover:outline hover:font-bold rounded-xl cursor-pointer p-2 outline-1 outline-blue-800 ${selectedDays.includes("Ter") && "outline outline-green-800 font-bold"}`} onClick={() => handleSelectedDay("Ter")}>Ter</span>
-                        <span className={`hover:outline hover:font-bold rounded-xl cursor-pointer p-2 outline-blue-800 ${selectedDays.includes("Qua") && "outline outline-green-800 font-bold"}`} onClick={() => handleSelectedDay("Qua")}>Qua</span>
+                        <span className={`hover:outline hover:font-bold rounded-xl cursor-pointer p-2 outline-1 outline-blue-800 ${selectedDays.includes("Qua") && "outline outline-green-800 font-bold"}`} onClick={() => handleSelectedDay("Qua")}>Qua</span>
                         <span className={`hover:outline hover:font-bold rounded-xl cursor-pointer p-2 outline-1 outline-blue-800 ${selectedDays.includes("Qui") && "outline outline-green-800 font-bold"}`} onClick={() => handleSelectedDay("Qui")}>Qui</span>
                         <span className={`hover:outline hover:font-bold rounded-xl cursor-pointer p-2 outline-1 outline-blue-800 ${selectedDays.includes("Sex") && "outline outline-green-800 font-bold"}`} onClick={() => handleSelectedDay("Sex")}>Sex</span>
                         <span className={`hover:outline hover:font-bold rounded-xl cursor-pointer p-2 outline-1 outline-blue-800 ${selectedDays.includes("Sáb") && "outline outline-green-800 font-bold"}`} onClick={() => handleSelectedDay("Sáb")}>Sáb</span>
