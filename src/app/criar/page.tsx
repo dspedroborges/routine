@@ -2,7 +2,7 @@
 
 import { getIcon, icons, TodoType } from "@/utils";
 import { useEffect, useState } from "react";
-import { BsCaretRightFill, BsPlusCircle, BsTrash, BsTrash2Fill } from "react-icons/bs";
+import { BsCaretDown, BsCaretRightFill, BsCaretUp, BsPlusCircle, BsTrash, BsTrash2Fill } from "react-icons/bs";
 import { FaSave } from "react-icons/fa";
 import { PiHandTapLight } from "react-icons/pi";
 import Toast from "../components/Toast";
@@ -56,7 +56,27 @@ export default function Page() {
             {
                 todos.length > 0 && todos.map((todo, i) => {
                     return (
-                        <div key={i} className="border-b-4 border-dotted border-blue-800 p-8 w-full lg:w-1/2 mx-auto my-8">
+                        <div key={i} className="border-b-4 border-dotted border-blue-800 p-8 w-full lg:w-1/2 mx-auto my-8 select-none">
+                            <div className="flex gap-2">
+                                <BsCaretDown className="hover:scale-110 cursor-pointer" onClick={() => {
+                                    const copy = JSON.parse(JSON.stringify(todos));
+                                    if (i + 1 < todos.length) {
+                                        const tmp = copy[i + 1];
+                                        copy[i + 1] = copy[i];
+                                        copy[i] = tmp;
+                                        setTodos(copy);
+                                    }
+                                }} />
+                                <BsCaretUp className="hover:scale-110 cursor-pointer" onClick={() => {
+                                    const copy = JSON.parse(JSON.stringify(todos));
+                                    if (i - 1 >= 0) {
+                                        const tmp = copy[i - 1];
+                                        copy[i - 1] = copy[i];
+                                        copy[i] = tmp;
+                                        setTodos(copy);
+                                    }
+                                }} />
+                            </div>
                             {
                                 deleteSure ? (
                                     <BsTrash className="text-red-500 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {

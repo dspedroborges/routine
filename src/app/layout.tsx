@@ -27,7 +27,6 @@ export default function RootLayout({
           <ul className="text-white flex gap-8 py-4 lg:py-0 px-8 text-md lg:text-xl font-bold">
             <Link href="/" className="hover:scale-105 hover:underline"><li>Afazeres</li></Link>
             <Link href="/criar" className="hover:scale-105 hover:underline"><li>Criar</li></Link>
-            <Link href="/estatistica" className="hover:scale-105 hover:underline"><li>Estatística</li></Link>
           </ul>
         </nav>
         {children}
