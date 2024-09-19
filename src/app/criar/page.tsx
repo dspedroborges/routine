@@ -9,7 +9,7 @@ import Toast from "../components/Toast";
 
 const getEmptyTodo = () => {
     return {
-        title: "",
+        title: "Sem nome",
         details: "",
         icon: "",
         days: "",
@@ -53,12 +53,12 @@ export default function Page() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col p-2">
+        <div className="min-h-screen flex flex-col p-2 select-none">
             {
                 todos.length > 0 && todos.map((todo, i) => {
                     return (
                         <div key={i}>
-                            <div className="p-4 rounded-xl my-2 cursor-pointer bg-gradient-to-tr hover:ring-2 ring-blue-500 from-black to-blue-950 text-white uppercase flex items-center justify-between">
+                            <div className="p-4 rounded-xl my-2 cursor-pointer bg-gradient-to-tr hover:ring-2 ring-blue-500 bg-white text-blue-800 border uppercase flex items-center justify-between">
                                 <div className="flex gap-2">
                                     <BsCaretDown className="hover:scale-110 cursor-pointer" onClick={() => {
                                         const copy = JSON.parse(JSON.stringify(todos));
@@ -91,7 +91,7 @@ export default function Page() {
                             </div>
                             {
                                 showTodo === i && (
-                                    <div key={i} className="border-4 border-dotted border-blue-800 p-8 w-full mx-auto my-4 rounded-xl select-none">
+                                    <div key={i} className="border-4 border-dotted border-blue-800 p-8 w-full mx-auto my-4 rounded-xl">
                                         {
                                             deleteSure ? (
                                                 <BsTrash className="text-red-500 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
