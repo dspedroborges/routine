@@ -2,7 +2,7 @@
 
 import { getIcon, icons, TodoType } from "@/utils";
 import { useEffect, useState } from "react";
-import { BsCaretDown, BsCaretRightFill, BsCaretUp, BsPlusCircle, BsTrash, BsTrash2Fill } from "react-icons/bs";
+import { BsCaretDown, BsCaretDownFill, BsCaretRightFill, BsCaretUp, BsCaretUpFill, BsPlusCircle, BsTrash, BsTrash2Fill } from "react-icons/bs";
 import { FaSave } from "react-icons/fa";
 import { PiHandTapLight } from "react-icons/pi";
 import Toast from "../components/Toast";
@@ -18,9 +18,10 @@ const getEmptyTodo = () => {
 }
 
 export default function Page() {
-    const [todos, setTodos] = useState([getEmptyTodo()]);
+    const [todos, setTodos] = useState<TodoType[]>([]);
     const [showToast, setShowToast] = useState(false);
     const [deleteSure, setDeleteSure] = useState(false);
+    const [showTodo, setShowTodo] = useState(-1);
 
     useEffect(() => {
         const savedTodos = localStorage.getItem("todos");
@@ -52,89 +53,106 @@ export default function Page() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center">
+        <div className="min-h-screen flex flex-col p-2">
             {
                 todos.length > 0 && todos.map((todo, i) => {
                     return (
-                        <div key={i} className="border-b-4 border-dotted border-blue-800 p-8 w-full lg:w-1/2 mx-auto my-8 select-none">
-                            <div className="flex gap-2">
-                                <BsCaretDown className="hover:scale-110 cursor-pointer" onClick={() => {
-                                    const copy = JSON.parse(JSON.stringify(todos));
-                                    if (i + 1 < todos.length) {
-                                        const tmp = copy[i + 1];
-                                        copy[i + 1] = copy[i];
-                                        copy[i] = tmp;
-                                        setTodos(copy);
+                        <div key={i}>
+                            <div className="p-4 rounded-xl my-2 cursor-pointer bg-gradient-to-tr hover:ring-2 ring-blue-500 from-black to-blue-950 text-white uppercase flex items-center justify-between">
+                                <div className="flex gap-2">
+                                    <BsCaretDown className="hover:scale-110 cursor-pointer" onClick={() => {
+                                        const copy = JSON.parse(JSON.stringify(todos));
+                                        if (i + 1 < todos.length) {
+                                            const tmp = copy[i + 1];
+                                            copy[i + 1] = copy[i];
+                                            copy[i] = tmp;
+                                            setTodos(copy);
+                                        }
+                                    }} />
+                                    <BsCaretUp className="hover:scale-110 cursor-pointer" onClick={() => {
+                                        const copy = JSON.parse(JSON.stringify(todos));
+                                        if (i - 1 >= 0) {
+                                            const tmp = copy[i - 1];
+                                            copy[i - 1] = copy[i];
+                                            copy[i] = tmp;
+                                            setTodos(copy);
+                                        }
+                                    }} />
+                                </div>
+                                <span className="hover:underline" onClick={() => {
+                                    if (showTodo === i) {
+                                        setShowTodo(-1)
+                                    } else {
+                                        setShowTodo(i)
                                     }
-                                }} />
-                                <BsCaretUp className="hover:scale-110 cursor-pointer" onClick={() => {
-                                    const copy = JSON.parse(JSON.stringify(todos));
-                                    if (i - 1 >= 0) {
-                                        const tmp = copy[i - 1];
-                                        copy[i - 1] = copy[i];
-                                        copy[i] = tmp;
-                                        setTodos(copy);
-                                    }
-                                }} />
+                                }}>{todo.title}</span>
+
+                                {showTodo === i ? <BsCaretDownFill /> : <BsCaretUpFill />}
                             </div>
                             {
-                                deleteSure ? (
-                                    <BsTrash className="text-red-500 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
-                                        let copy = JSON.parse(JSON.stringify(todos));
-                                        let filter = [];
-                                        for (let j = 0; j < copy.length; j++) {
-                                            if (j !== i) filter.push(copy[j]);
+                                showTodo === i && (
+                                    <div key={i} className="border-4 border-dotted border-blue-800 p-8 w-full mx-auto my-4 rounded-xl select-none">
+                                        {
+                                            deleteSure ? (
+                                                <BsTrash className="text-red-500 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
+                                                    let copy = JSON.parse(JSON.stringify(todos));
+                                                    let filter = [];
+                                                    for (let j = 0; j < copy.length; j++) {
+                                                        if (j !== i) filter.push(copy[j]);
+                                                    }
+                                                    setTodos(filter);
+                                                }} />
+                                            ) : (
+                                                <BsTrash className="text-red-800 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
+                                                    setDeleteSure(true);
+                                                    setTimeout(() => {
+                                                        setDeleteSure(false);
+                                                    }, 3000);
+                                                }} />
+                                            )
                                         }
-                                        setTodos(filter);
-                                    }} />
-                                ) : (
-                                    <BsTrash className="text-red-800 text-6xl text-left ml-[80%] lg:ml-[95%] hover:scale-90 cursor-pointer" onClick={() => {
-                                        setDeleteSure(true);
-                                        setTimeout(() => {
-                                            setDeleteSure(false);
-                                        }, 3000);
-                                    }} />
+                                        <h3 className="text-2xl font-bold text-blue-800 text-center">Afazer #{i + 1}</h3>
+                                        <div>
+                                            <label htmlFor={`title_${i}`} className="block font-bold text-blue-800 my-4 cursor-pointer">Título</label>
+                                            <input type="text" id={`title_${i}`} className="border p-2 w-full rounded-xl outline-blue-800" onChange={(e) => {
+                                                const copy = JSON.parse(JSON.stringify(todos));
+                                                copy[i].title = e.target.value;
+                                                setTodos(copy);
+                                            }} value={todo.title} />
+                                        </div>
+                                        <div>
+                                            <label htmlFor={`details_${i}`} className="block font-bold text-blue-800 my-4 cursor-pointer">Detalhes</label>
+                                            <textarea id={`details_${i}`} className="border p-2 w-full min-h-[100px] rounded-xl outline-blue-800" onChange={(e) => {
+                                                const copy = JSON.parse(JSON.stringify(todos));
+                                                copy[i].details = e.target.value;
+                                                setTodos(copy);
+                                            }} value={todo.details} />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="icon" className="block font-bold text-blue-800 my-4 cursor-pointer">Ícone</label>
+                                            <IconSelect onChange={handleIconSelect} currentTodo={i} value={todo.icon} />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="days" className="block font-bold text-blue-800 my-4 cursor-pointer">Dias</label>
+                                            <DaySelect onChange={handleDaySelect} currentTodo={i} value={todo.days} />
+                                        </div>
+                                        <div>
+                                            <label htmlFor={`importance_${i}`} className="block font-bold text-blue-800 my-4 cursor-pointer">Importância</label>
+                                            <select id={`importance_${i}`} onChange={(e) => {
+                                                const copy = JSON.parse(JSON.stringify(todos));
+                                                copy[i].importance = Number(e.target.value);
+                                                console.log(e.target.value);
+                                                setTodos(copy);
+                                            }} value={todo.importance} className="w-full p-2 rounded-xl border outline-blue-800">
+                                                <option value="">Selecione uma opção</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 )
                             }
-                            <h3 className="text-2xl font-bold text-blue-800 text-center">Afazer #{i + 1}</h3>
-                            <div>
-                                <label htmlFor={`title_${i}`} className="block font-bold text-blue-800 my-4 cursor-pointer">Título</label>
-                                <input type="text" id={`title_${i}`} className="border p-2 w-full rounded-xl outline-blue-800" onChange={(e) => {
-                                    const copy = JSON.parse(JSON.stringify(todos));
-                                    copy[i].title = e.target.value;
-                                    setTodos(copy);
-                                }} value={todo.title} />
-                            </div>
-                            <div>
-                                <label htmlFor={`details_${i}`} className="block font-bold text-blue-800 my-4 cursor-pointer">Detalhes</label>
-                                <textarea id={`details_${i}`} className="border p-2 w-full min-h-[100px] rounded-xl outline-blue-800" onChange={(e) => {
-                                    const copy = JSON.parse(JSON.stringify(todos));
-                                    copy[i].details = e.target.value;
-                                    setTodos(copy);
-                                }} value={todo.details} />
-                            </div>
-                            <div>
-                                <label htmlFor="icon" className="block font-bold text-blue-800 my-4 cursor-pointer">Ícone</label>
-                                <IconSelect onChange={handleIconSelect} currentTodo={i} value={todo.icon} />
-                            </div>
-                            <div>
-                                <label htmlFor="days" className="block font-bold text-blue-800 my-4 cursor-pointer">Dias</label>
-                                <DaySelect onChange={handleDaySelect} currentTodo={i} value={todo.days} />
-                            </div>
-                            <div>
-                                <label htmlFor={`importance_${i}`} className="block font-bold text-blue-800 my-4 cursor-pointer">Importância</label>
-                                <select id={`importance_${i}`} onChange={(e) => {
-                                    const copy = JSON.parse(JSON.stringify(todos));
-                                    copy[i].importance = Number(e.target.value);
-                                    console.log(e.target.value);
-                                    setTodos(copy);
-                                }} value={todo.importance} className="w-full p-2 rounded-xl border outline-blue-800">
-                                    <option value="">Selecione uma opção</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                </select>
-                            </div>
                         </div>
                     )
                 })
@@ -142,7 +160,7 @@ export default function Page() {
 
             {showToast && <Toast content="Salvo!" type="success" setShowToast={setShowToast} />}
 
-            <div className="flex justify-center items-center gap-4 mx-auto">
+            <div className="flex justify-center items-center gap-4 mx-auto my-8">
                 <BsPlusCircle className="text-6xl text-blue-800 hover:scale-90 cursor-pointer" onClick={() => setTodos([...todos, getEmptyTodo()])} />
                 <FaSave className="text-6xl text-green-800 hover:scale-90 cursor-pointer" onClick={(() => {
                     localStorage.setItem("todos", JSON.stringify(todos));
