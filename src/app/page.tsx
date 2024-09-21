@@ -52,14 +52,14 @@ export default function Home() {
         switch (step) {
           case 0: {
             const currentWeekDayName = numberToWeekDay(currentWeekDay);
-            if (value.search(currentWeekDayName) !== -1) filter.push(toBeChecked[i]);
+            if (value?.search(currentWeekDayName) !== -1) filter.push(toBeChecked[i]);
           } break;
           case 1: {
-            const days = value.split("/").map((e: string) => Number(e));
+            const days = value?.split("/").map((e: string) => Number(e));
             if (days[0] === currentDay && days[1] === currentMonth) filter.push(toBeChecked[i]);
           } break;
           case 2: {
-            const days = value.split("/").map((e: string) => Number(e));
+            const days = value?.split("/").map((e: string) => Number(e));
             if (days[0] === currentDay && days[1] === currentMonth && days[2] === currentYear) filter.push(toBeChecked[i]);
           } break;
         }
